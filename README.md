@@ -29,3 +29,10 @@ it fits the same version, so `error='l'` can quietly give you level M. Pass
 `boost_error=False` or you will measure the wrong thing, as I did at first.
 
 MIT licensed.
+
+## Contributing
+
+Issues and pull requests are welcome, and especially so during Hacktoberfest.
+The [good first issues](https://github.com/DimitrovK/qr-damage/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+are deliberately small: charting the damage curves, adding the targeted-damage
+mode from the write-up, comparing a second decoder, and testing the mask.
