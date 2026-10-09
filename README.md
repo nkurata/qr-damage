@@ -13,10 +13,12 @@ The short answer: **where** you damage it matters far more than **how much**.
 ![15% covered, still scans](images/demo_patch.png)
 ![0.7% erased from the timing row, dead](images/demo_timing.png)
 
+![damage curves: success rate against damage, sticker and speckle](images/damage_curves.png)
+
 ## Run it
 
 ```bash
-pip install segno opencv-python-headless pillow numpy
+pip install segno opencv-python-headless pillow numpy matplotlib
 python damage.py
 ```
 

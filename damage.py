@@ -11,6 +11,9 @@ import random
 import cv2
 import numpy as np
 import segno
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 PAYLOAD = "https://example.com/hello"
 SCALE, BORDER = 10, 4
@@ -57,16 +60,46 @@ def speckle(mat, frac, rng):
     return m
 
 
-if __name__ == "__main__":
-    for name, fn, fracs in (("sticker over data", sticker, [.05, .10, .15, .20, .25]),
-                            ("scattered speckle", speckle, [.01, .02, .03, .05])):
+MODELS = (("sticker over data", sticker, [.05, .10, .15, .20, .25]),
+          ("scattered speckle", speckle, [.01, .02, .03, .05]))
+
+
+def sweep():
+    # fixed seed per row, so the tables and the chart are reproducible
+    results = {}
+    for name, fn, fracs in MODELS:
         print(f"\n{name} — % of 200 attempts that still decoded")
         print("  EC  " + "".join(f"{int(f*100):>7}%" for f in fracs))
+        results[name] = {}
         for ec in "lmqh":
             mat, _ = base(ec)
             rng = random.Random(21)
             row = [sum(decodes(fn(mat, f, rng)) for _ in range(200)) / 200 for f in fracs]
             print(f"  {ec.upper():<3} " + "".join(f"{v*100:>7.1f} " for v in row))
+            results[name][ec] = row
+    return results
+
+
+def chart(results, path="images/damage_curves.png"):
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
+    for ax, (name, _, fracs) in zip(axes, MODELS):
+        for ec in "lmqh":
+            ax.plot([f * 100 for f in fracs], [v * 100 for v in results[name][ec]],
+                    marker="o", label=ec.upper())
+        ax.set_title(name)
+        ax.set_xlabel("damage (% of modules)")
+        ax.set_ylim(0, 100)
+        ax.grid(True, alpha=0.3)
+    axes[0].set_ylabel("decode success rate (%)")
+    axes[0].legend(title="EC")
+    fig.tight_layout()
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+    print(f"\nchart saved to {path}")
+
+
+if __name__ == "__main__":
+    chart(sweep())
 
     print("\ntargeted structural damage")
     for ec in ("l", "h"):
